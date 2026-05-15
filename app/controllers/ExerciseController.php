@@ -44,6 +44,13 @@ class ExerciseController {
             $comments = $commentModel->getByExerciseId($id);
 
             require_once '../app/views/exercises/exercise_show.php';
+            // Pod načítání komentářů přidej:
+            require_once '../app/models/Favorite.php';
+            $favoriteModel = new Favorite($this->db);
+            $isFavorite = false;
+            if (isset($_SESSION['user_id'])) {
+                $isFavorite = $favoriteModel->isFavorite($_SESSION['user_id'], $id);
+            }
         }
 
     public function create() {

@@ -23,6 +23,11 @@ class UserController {
             exit;
         }
 
+        // Pod načtení usera přidej:
+        require_once '../app/models/Favorite.php';
+        $favoriteModel = new Favorite($db);
+        $favoriteExercises = $favoriteModel->getByUserId($_SESSION['user_id']);
+
         // Výpočet BMI
         $bmi = null;
         $bmiCategory = null;

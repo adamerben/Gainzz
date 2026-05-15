@@ -73,9 +73,12 @@
 
                 <div class="mt-auto pt-8 border-t border-slate-100 flex gap-4 items-center">
                     <?php if (isset($_SESSION['user_id'])): ?>
-                        <button class="bg-slate-900 text-white font-black uppercase px-8 py-4 rounded-xl hover:bg-orange-500 transition-all shadow-lg flex-grow tracking-widest">
-                            Přidat do oblíbených
-                        </button>
+                        <?php if (isset($_SESSION['user_id'])): ?>
+                            <a href="<?= BASE_URL ?>/index.php?url=favorite/toggle/<?= $exercise['id'] ?>" 
+                            class="<?= $isFavorite ? 'bg-orange-600' : 'bg-slate-900' ?> text-white font-black uppercase px-8 py-4 rounded-xl hover:bg-orange-500 transition-all shadow-lg flex-grow tracking-widest text-center">
+                                <?= $isFavorite ? '❤️ V mém tréninku' : '🤍 Přidat do oblíbených' ?>
+                            </a>
+                            <?php endif; ?>
                         <?php if ($_SESSION['user_role'] === 'admin'): ?>
                             <a href="<?= BASE_URL ?>/index.php?url=exercise/edit/<?= $exercise['id'] ?>" class="p-4 bg-slate-100 rounded-xl hover:bg-slate-200 transition-colors shadow-sm" title="Upravit cvik">✏️</a>
                         <?php endif; ?>

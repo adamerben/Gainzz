@@ -60,4 +60,30 @@
     </section>
 </main>
 
+<div class="mt-12">
+    <h3 class="text-2xl font-black text-slate-900 uppercase italic mb-6">Můj tréninkový <span class="text-orange-500">plán</span></h3>
+    <?php if (empty($favoriteExercises)): ?>
+        <p class="text-slate-500 font-medium bg-white p-6 rounded-2xl border border-slate-100 shadow-sm">Zatím nemáš vybrané žádné cviky. Koukni do katalogu!</p>
+    <?php else: ?>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <?php foreach ($favoriteExercises as $fav): ?>
+                <a href="<?= BASE_URL ?>/index.php?url=exercise/show/<?= $fav['id'] ?>" class="flex items-center gap-4 bg-white p-4 rounded-2xl shadow-sm border border-slate-100 hover:border-orange-500 transition-colors group">
+                    <div class="w-16 h-16 bg-slate-900 rounded-xl overflow-hidden flex-shrink-0">
+                        <?php if ($fav['image_path']): ?>
+                            <img src="<?= BASE_URL ?>/<?= $fav['image_path'] ?>" class="w-full h-full object-cover">
+                        <?php else: ?>
+                            <span class="flex items-center justify-center h-full text-2xl">💪</span>
+                        <?php endif; ?>
+                    </div>
+                    <div>
+                        <h4 class="font-black text-slate-800 uppercase group-hover:text-orange-500 transition-colors"><?= htmlspecialchars($fav['title']) ?></h4>
+                        <span class="text-xs font-bold text-slate-400 uppercase tracking-widest"><?= htmlspecialchars($fav['muscle_group_name']) ?></span>
+                    </div>
+                    <span class="ml-auto text-orange-500 font-black text-xl mr-2">→</span>
+                </a>
+            <?php endforeach; ?>
+        </div>
+    <?php endif; ?>
+</div>
+
 <?php require_once '../app/views/layout/footer.php'; ?>
