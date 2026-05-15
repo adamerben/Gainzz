@@ -48,14 +48,44 @@ class User {
         // Vrátí pole s daty uživatele, nebo false pokud neexistuje
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
-    
-    // 3. Získání uživatele podle ID (hodí se pro zobrazení profilu atd.)
-    public function findById(int $id) {
-        // Zde jsme také přidali nová pole, aby se nám při načtení profilu vypsalo všechno
-        $sql = "SELECT id, username, email, first_name, last_name, nickname, created_at FROM users WHERE id = :id";
+
+    public function getById(int $id) {
+        $sql = "SELECT * FROM users WHERE id = :id";
         $stmt = $this->db->prepare($sql);
         $stmt->execute([':id' => $id]);
-        
+
         return $stmt->fetch(PDO::FETCH_ASSOC);
+    }
+
+    public function updateProfile(int $id, array $data): bool {
+        $sql = "UPDATE users SET weight = :weight, height = :height, bio = :bio WHERE id = :id";
+        $stmt = $this->db->prepare($sql);
+
+        return $stmt->execute([
+            ':id' => $id,
+            ':weight' => $data['weight'],
+            ':height' => $data['height'],
+            ':bio' => $data['bio'],
+        ]);
+    }
+
+    public function getById(int $id) {
+        $sql = "SELECT * FROM users WHERE id = :id";
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute([':id' => $id]);
+
+        return $stmt->fetch(PDO::FETCH_ASSOC);
+    }
+
+    public function updateProfile(int $id, array $data): bool {
+        $sql = "UPDATE users SET weight = :weight, height = :height, bio = :bio WHERE id = :id";
+        $stmt = $this->db->prepare($sql);
+
+        return $stmt->execute([
+            ':id' => $id,
+            ':weight' => $data['weight'],
+            ':height' => $data['height'],
+            ':bio' => $data['bio'],
+        ]);
     }
 }
