@@ -37,20 +37,23 @@ class ExerciseController {
                 exit;
             }
 
-            // TADY JE TA OPRAVA: Musíme načíst soubor Comment.php, jinak PHP neví, co je class Comment
+            // 1. Načtení komentářů z databáze
             require_once '../app/models/Comment.php'; 
-            
             $commentModel = new Comment($this->db);
             $comments = $commentModel->getByExerciseId($id);
 
-            require_once '../app/views/exercises/exercise_show.php';
-            // Pod načítání komentářů přidej:
+            // 2. Zjištění, zda má přihlášený uživatel tento cvik v oblíbených
             require_once '../app/models/Favorite.php';
             $favoriteModel = new Favorite($this->db);
-            $isFavorite = false;
+            $isFavorite = false; // Výchozí stav je "nepřidáno"
+            
             if (isset($_SESSION['user_id'])) {
                 $isFavorite = $favoriteModel->isFavorite($_SESSION['user_id'], $id);
             }
+
+            // 3. Načtení samotného designu (Toto MUSÍ BÝT VŽDY ÚPLNĚ DOLE, 
+            //    až když máme připravené všechny proměnné jako $exercise, $comments a $isFavorite)
+            require_once '../app/views/exercises/exercise_show.php';
         }
 
     public function create() {
