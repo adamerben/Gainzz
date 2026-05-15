@@ -1,138 +1,82 @@
 <?php require_once '../app/views/layout/header.php'; ?>
 
-    <main class="container mx-auto px-6 py-10 flex-grow">
+<main class="container mx-auto px-6 py-10 flex-grow">
+    <div class="max-w-2xl mx-auto bg-white rounded-3xl shadow-xl border border-slate-100 overflow-hidden">
         
-        <div class="max-w-3xl mx-auto">
-            <div class="mb-6 flex items-center justify-between">
-                <div>
-                    <h2 class="text-3xl font-light tracking-widest text-slate-200 uppercase">Přidat novou knihu</h2>
-                    <p class="text-slate-200 italic mt-1 text-sm">Vyplňte údaje a uložte knihu do databáze.</p>
-                </div>
-                <a href="<?= BASE_URL ?>/index.php" class="text-slate-100 hover:text-white transition-colors text-sm uppercase tracking-wider">&larr; Zpět</a>
-            </div>
-            
-            <div class="bg-slate-800/50 border border-slate-400 rounded-xl shadow-2xl backdrop-blur-sm p-6 md:p-8">
-                <form action="<?= BASE_URL ?>/index.php?url=book/store" method="post" enctype="multipart/form-data">
-                    
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        
-                        <div>
-                            <label for="title" class="block text-xs font-semibold text-slate-100 mb-1 uppercase tracking-wider">Název knihy <span class="text-rose-500">*</span></label>
-                            <input type="text" id="title" name="title" required 
-                                   class="w-full bg-slate-900/50 border border-slate-400 rounded-md px-4 py-2 text-slate-200 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors">
-                        </div>
-                        
-                        <div>
-                            <label for="author" class="block text-xs font-semibold text-slate-100 mb-1 uppercase tracking-wider">Autor <span class="text-rose-500">*</span></label>
-                            <input type="text" id="author" name="author" placeholder="Příjmení Jméno" required 
-                                   class="w-full bg-slate-900/50 border border-slate-400 rounded-md px-4 py-2 text-slate-200 placeholder-slate-600 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors">
-                        </div>
-                        
-                        <div>
-                            <label for="isbn" class="block text-xs font-semibold text-slate-100 mb-1 uppercase tracking-wider">ISBN <span class="text-rose-500">*</span></label>
-                            <input type="text" id="isbn" name="isbn" 
-                                   class="w-full bg-slate-900/50 border border-slate-400 rounded-md px-4 py-2 text-slate-200 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors">
-                        </div>
-
-                        <div>
-                            <label for="year" class="block text-xs font-semibold text-slate-100 mb-1 uppercase tracking-wider">Rok vydání <span class="text-rose-500">*</span></label>
-                            <input type="number" id="year" name="year" required 
-                                   class="w-full bg-slate-900/50 border border-slate-400 rounded-md px-4 py-2 text-slate-200 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors">
-                        </div>
-                        
-                        <div>
-                            <label for="category" class="block text-xs font-semibold text-slate-100 mb-1 uppercase tracking-wider">
-                                Kategorie <span class="text-rose-500">*</span>
-                            </label>
-                            <select id="category" name="category" required 
-                                    class="w-full bg-slate-900/50 border border-slate-400 rounded-md px-4 py-2 text-slate-200 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors appearance-none">
-                                <option value="" class="bg-slate-900">-- Vyberte kategorii --</option>
-                                
-                                <?php foreach ($categories as $cat): ?>
-                                    <option value="<?= htmlspecialchars($cat['id']) ?>" class="bg-slate-900">
-                                        <?= htmlspecialchars($cat['name']) ?>
-                                    </option>
-                                <?php endforeach; ?>
-                            </select>
-                        </div>
-                        
-                        <div>
-                            <label for="subcategory" class="block text-xs font-semibold text-slate-100 mb-1 uppercase tracking-wider">Podkategorie</label>
-                            <input type="text" id="subcategory" name="subcategory" 
-                                   class="w-full bg-slate-900/50 border border-slate-400 rounded-md px-4 py-2 text-slate-200 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors">
-                        </div>
-                        
-                        <div>
-                            <label for="price" class="block text-xs font-semibold text-slate-100 mb-1 uppercase tracking-wider">Cena knihy (Kč)</label>
-                            <input type="number" id="price" name="price" step="0.5" 
-                                   class="w-full bg-slate-900/50 border border-slate-400 rounded-md px-4 py-2 text-slate-200 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors">
-                        </div>
-                        
-                        <div>
-                            <label for="link" class="block text-xs font-semibold text-slate-100 mb-1 uppercase tracking-wider">Odkaz</label>
-                            <input type="text" id="link" name="link" placeholder="https://..." 
-                                   class="w-full bg-slate-900/50 border border-slate-400 rounded-md px-4 py-2 text-slate-200 placeholder-slate-600 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors">
-                        </div>
-                        
-                        <div class="md:col-span-2">
-                            <label for="description" class="block text-xs font-semibold text-slate-100 mb-1 uppercase tracking-wider">Popis knihy</label>
-                            <textarea id="description" name="description" rows="5" 
-                                      class="w-full bg-slate-900/50 border border-slate-400 rounded-md px-4 py-2 text-slate-200 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors"></textarea>
-                        </div>    
-                        
-                        <div class="md:col-span-2">
-                            <label class="block text-xs font-semibold text-slate-100 mb-2 uppercase tracking-wider">Obrázky knihy</label>
-                            <div class="w-full">
-                                <label for="images" class="flex flex-col items-center justify-center w-full h-24 border-2 border-slate-400 border-dashed rounded-lg cursor-pointer bg-slate-800/30 hover:bg-slate-700/50 hover:border-blue-400 transition-colors">
-                                    <div class="flex flex-col items-center justify-center pt-5 pb-6">
-                                        <span id="file-title" class="text-sm text-slate-100 font-semibold">Klikni pro výběr souborů</span>
-                                        <span id="file-info" class="text-xs text-slate-500 mt-1 text-center px-4">Žádné soubory nebyly vybrány</span>
-                                    </div>
-                                    <input type="file" id="images" name="images[]" multiple accept="image/*" class="hidden">
-                                </label>
-                            </div>
-                        </div>
-                                                
-                        <div class="md:col-span-2 mt-4">
-                            <button type="submit" 
-                                    class="w-full bg-gradient-to-r from-blue-600 to-blue-800 hover:from-blue-500 hover:to-blue-700 text-white font-bold py-3 px-4 rounded-md shadow-lg border border-blue-500 transition-all uppercase tracking-widest text-sm">
-                                Uložit knihu do DB
-                            </button>
-                        </div>
-
-                    </div>
-                </form>
-            </div>
+        <div class="bg-slate-900 p-8 border-b-4 border-orange-500">
+            <h2 class="text-3xl font-black text-white uppercase italic tracking-widest text-center">Přidat nový <span class="text-orange-500">cvik</span></h2>
         </div>
-        <script>
-            // Najdeme naše HTML prvky podle ID
-            const fileInput = document.getElementById('images');
-            const fileTitle = document.getElementById('file-title');
-            const fileInfo = document.getElementById('file-info');
 
-            // Posloucháme událost 'change' (změna hodnoty v inputu)
-            fileInput.addEventListener('change', function(event) {
-                const files = event.target.files;
-                
-                if (files.length === 0) {
-                    // Uživatel výběr zrušil
-                    fileTitle.textContent = 'Klikněte pro výběr souborů';
-                    fileTitle.className = 'text-sm text-slate-100 font-semibold';
-                    fileInfo.textContent = 'Žádné soubory nebyly vybrány';
-                } else if (files.length === 1) {
-                    // Vybrán 1 soubor - ukážeme jeho název
-                    fileTitle.textContent = 'Soubor připraven';
-                    fileTitle.className = 'text-sm text-blue-400 font-bold';
-                    fileInfo.textContent = files[0].name;
-                } else {
-                    // Vybráno více souborů - ukážeme počet
-                    fileTitle.textContent = 'Soubory připraveny';
-                    fileTitle.className = 'text-sm text-blue-400 font-bold';
-                    fileInfo.textContent = 'Vybráno celkem: ' + files.length + ' souborů';
-                }
-            });
-        </script>    
-    </main>
+        <form action="<?= BASE_URL ?>/index.php?url=exercise/store" method="POST" enctype="multipart/form-data" class="p-8 space-y-6">
+            
+            <div>
+                <label class="block text-xs font-black uppercase tracking-widest text-slate-500 mb-2">Název cviku</label>
+                <input type="text" name="title" required class="w-full bg-slate-50 border-2 border-slate-200 rounded-xl px-4 py-3 focus:border-orange-500 focus:outline-none transition-colors font-bold" placeholder="Např. Bench-press">
+            </div>
 
-<?php require_once '../app/views/layout/footer.php'; ?>    
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <label class="block text-xs font-black uppercase tracking-widest text-slate-500 mb-2">Svalová partie</label>
+                    <select name="muscle_group_id" required class="w-full bg-slate-50 border-2 border-slate-200 rounded-xl px-4 py-3 focus:border-orange-500 focus:outline-none transition-colors font-bold">
+                        <?php foreach ($muscleGroups as $group): ?>
+                            <option value="<?= $group['id'] ?>"><?= htmlspecialchars($group['name']) ?></option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
 
+                <div>
+                    <label class="block text-xs font-black uppercase tracking-widest text-slate-500 mb-2">Obtížnost</label>
+                    <select name="difficulty" class="w-full bg-slate-50 border-2 border-slate-200 rounded-xl px-4 py-3 focus:border-orange-500 focus:outline-none transition-colors font-bold">
+                        <option value="Začátečník">Začátečník</option>
+                        <option value="Pokročilý">Pokročilý</option>
+                        <option value="Expert">Expert</option>
+                    </select>
+                </div>
+            </div>
+
+            <div>
+                <label class="block text-xs font-black uppercase tracking-widest text-slate-500 mb-2">Potřebné vybavení</label>
+                <select name="equipment" class="w-full bg-slate-50 border-2 border-slate-200 rounded-xl px-4 py-3 focus:border-orange-500 focus:outline-none transition-colors font-bold">
+                    <option value="Vlastní váha">Vlastní váha</option>
+                    <option value="Velká činka">Velká činka</option>
+                    <option value="Jednoručky">Jednoručky</option>
+                    <option value="Stroj">Stroj / Kladka</option>
+                    <option value="Hrazda">Hrazda / Bradla</option>
+                </select>
+            </div>
+
+            <div>
+                <label class="block text-xs font-black uppercase tracking-widest text-slate-500 mb-2">Popis techniky</label>
+                <textarea name="description" rows="4" class="w-full bg-slate-50 border-2 border-slate-200 rounded-xl px-4 py-3 focus:border-orange-500 focus:outline-none transition-colors font-bold" placeholder="Popište správné provedení cviku..."></textarea>
+            </div>
+
+            <div>
+                <label class="block text-xs font-black uppercase tracking-widest text-slate-500 mb-2">Ilustrační obrázek</label>
+                <div class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-slate-200 border-dashed rounded-xl bg-slate-50">
+                    <div class="space-y-1 text-center">
+                        <span class="text-3xl block">🖼️</span>
+                        <div class="flex text-sm text-slate-600">
+                            <label for="file-upload" class="relative cursor-pointer font-black text-orange-500 hover:text-orange-600">
+                                <span>Nahrajte soubor</span>
+                                <input id="file-upload" name="image" type="file" class="sr-only">
+                            </label>
+                        </div>
+                        <p class="text-xs text-slate-400">PNG, JPG do 2MB</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex gap-4 pt-4">
+                <button type="submit" class="flex-grow bg-orange-500 hover:bg-orange-600 text-white font-black uppercase py-4 rounded-xl shadow-lg transition-all transform hover:-translate-y-1 tracking-widest">
+                    Uložit cvik do databáze
+                </button>
+                <a href="<?= BASE_URL ?>/index.php" class="bg-slate-200 hover:bg-slate-300 text-slate-700 font-black uppercase py-4 px-6 rounded-xl transition-all">
+                    Zrušit
+                </a>
+            </div>
+
+        </form>
+    </div>
+</main>
+
+<?php require_once '../app/views/layout/footer.php'; ?>

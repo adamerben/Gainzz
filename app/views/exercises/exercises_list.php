@@ -1,66 +1,69 @@
 <?php require_once '../app/views/layout/header.php'; ?>    
 
-    <main class="container mx-auto px-6 py-10">
-        
-        <div class="flex justify-between items-end mb-6">
-            <h2 class="text-3xl font-light tracking-widest text-slate-200 uppercase">Dostupné knihy</h2>
+<main class="container mx-auto px-6 py-6 flex-grow">
+    
+    <div class="flex justify-between items-end mb-8 border-b-2 border-slate-200 pb-4">
+        <div>
+            <h2 class="text-4xl font-black text-slate-900 uppercase tracking-tight">Katalog cviků</h2>
+            <p class="text-slate-500 mt-1 font-medium">Inspirace pro tvůj další trénink</p>
         </div>
-        
-        <div class="bg-slate-800/50 border border-slate-700 rounded-xl overflow-hidden shadow-2xl backdrop-blur-sm">
-            <?php if (empty($books)): ?>
-                <div class="p-10 text-center text-slate-500 italic">
-                    V databázi se zatím nenachází žádné knihy.
-                </div>
-            <?php else: ?>
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left border-collapse">
-                        <thead>
-                            <tr class="bg-slate-700/50 border-b border-slate-600">
-                                <th class="px-6 py-4 font-semibold uppercase text-xs text-slate-200 tracking-wider text-center">ID</th>
-                                <th class="px-6 py-4 font-semibold uppercase text-xs text-slate-200 tracking-wider">Název knihy</th>
-                                <th class="px-6 py-4 font-semibold uppercase text-xs text-slate-200 tracking-wider">Autor</th>
-                                <th class="px-6 py-4 font-semibold uppercase text-xs text-slate-200 tracking-wider">Kategorie</th>
-                                <th class="px-6 py-4 font-semibold uppercase text-xs text-slate-200 tracking-wider">Rok</th>
-                                <th class="px-6 py-4 font-semibold uppercase text-xs text-slate-200 tracking-wider text-right">Cena</th>
-                                <th class="px-6 py-4 font-semibold uppercase text-xs text-slate-200 tracking-wider text-center">Akce</th>
-                            </tr>
-                        </thead>
-                        <tbody class="divide-y divide-slate-700">
-                            <?php foreach ($books as $book): ?>
-                                <tr class="hover:bg-slate-700/30 transition-colors group">
-                                    <td class="px-6 py-4 text-center text-slate-500 text-sm italic"><?= htmlspecialchars($book['id']) ?></td>
-                                    <td class="px-6 py-4 font-medium text-white group-hover:text-blue-400"><?= htmlspecialchars($book['title']) ?></td>
-                                    <td class="px-6 py-4 text-slate-300"><?= htmlspecialchars($book['author']) ?></td>
-                                    <td class="px-6 py-4 text-emerald-400 font-medium">
-                                        <?= htmlspecialchars($book['category_name'] ?? 'Nezařazeno') ?>
-                                    </td>
-                                    <td class="px-6 py-4 text-slate-400 font-mono"><?= htmlspecialchars($book['year']) ?></td>
-                                    <td class="px-6 py-4 text-right font-bold text-slate-200"><?= htmlspecialchars($book['price']) ?> Kč</td>
-                                                                        <td class="px-6 py-4 text-center">
-                                        <div class="flex justify-center space-x-3 text-sm">
-                                            
-                                            <a href="<?= BASE_URL ?>/index.php?url=book/show/<?= $book['id'] ?>" class="text-blue-400 hover:text-white transition-colors underline decoration-blue-800 underline-offset-4">Detail</a>
-                                            
-                                            <?php 
-                                            // 💡 ZMĚNA: Kontrola administrátora pro frontend
-                                            $isAdmin = isset($_SESSION['is_admin']) && $_SESSION['is_admin'] == 1;
-                                            
-                                            // Tlačítka zobrazíme POKUD je autor NEBO je admin
-                                            if (isset($_SESSION['user_id']) && ($_SESSION['user_id'] === $book['created_by'] || $isAdmin)): 
-                                            ?>
-                                                <a href="<?= BASE_URL ?>/index.php?url=book/edit/<?= $book['id'] ?>" class="text-emerald-400 hover:text-white transition-colors underline decoration-emerald-800 underline-offset-4">Upravit</a>
-                                                <a href="<?= BASE_URL ?>/index.php?url=book/delete/<?= $book['id'] ?>" onclick="return confirm('Opravdu chcete tuto knihu smazat?')" class="text-rose-400 hover:text-white transition-colors underline decoration-rose-800 underline-offset-4">Smazat</a>
-                                            <?php endif; ?>
-                                            
-                                        </div>
-                                    </td>
-                                </tr>
-                            <?php endforeach; ?>
-                        </tbody>
-                    </table>
-                </div>
-            <?php endif; ?>
+    </div>
+    
+    <?php if (empty($exercises)): ?>
+        <div class="bg-white rounded-xl shadow-md p-12 text-center border border-slate-100">
+            <span class="text-6xl mb-4 block">🏋️‍♂️</span>
+            <h3 class="text-2xl font-black text-slate-700 mb-2 uppercase">Zatím tu nic není</h3>
+            <p class="text-slate-500 font-medium">Databáze cviků je momentálně prázdná. Přidejte první cvik!</p>
         </div>
-    </main>
+    <?php else: ?>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+            <?php foreach ($exercises as $exercise): ?>
+                <div class="bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 border border-slate-100 flex flex-col group">
+                    
+                    <div class="relative h-48 bg-slate-900 overflow-hidden flex items-center justify-center">
+                        <?php if (!empty($exercise['image_path'])): ?>
+                            <img src="<?= BASE_URL ?>/<?= htmlspecialchars($exercise['image_path']) ?>" alt="<?= htmlspecialchars($exercise['title']) ?>" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 opacity-90 group-hover:opacity-100">
+                        <?php else: ?>
+                            <span class="text-6xl group-hover:scale-110 transition-transform duration-500">💪</span>
+                        <?php endif; ?>
+                        
+                        <div class="absolute top-4 left-4 bg-orange-500 text-white text-xs font-black uppercase px-3 py-1.5 rounded-full shadow-md tracking-wider">
+                            <?= htmlspecialchars($exercise['muscle_group_name'] ?? 'Neznámá partie') ?>
+                        </div>
+                    </div>
 
-<?php require_once '../app/views/layout/footer.php'; ?>    
+                    <div class="p-6 flex-grow flex flex-col">
+                        <h3 class="text-xl font-black text-slate-800 mb-3 uppercase tracking-wide"><?= htmlspecialchars($exercise['title']) ?></h3>
+                        
+                        <div class="flex items-center gap-2 mb-4 text-xs text-slate-600 font-bold uppercase tracking-wider">
+                            <span class="bg-slate-100 border border-slate-200 px-2 py-1 rounded">⚙️ <?= htmlspecialchars($exercise['equipment']) ?></span>
+                            <span class="bg-slate-100 border border-slate-200 px-2 py-1 rounded">🔥 <?= htmlspecialchars($exercise['difficulty']) ?></span>
+                        </div>
+                        
+                        <p class="text-slate-500 text-sm line-clamp-3 mb-6 flex-grow">
+                            <?= htmlspecialchars($exercise['description']) ?>
+                        </p>
+                        
+                        <div class="flex justify-between items-center pt-4 border-t border-slate-100 mt-auto">
+                            <a href="<?= BASE_URL ?>/index.php?url=exercise/show/<?= $exercise['id'] ?>" class="text-orange-500 font-black hover:text-orange-600 uppercase text-sm tracking-widest flex items-center gap-1 transition-colors">
+                                Detail <span class="text-lg">&rarr;</span>
+                            </a>
+                            
+                            <?php 
+                            // Editační tlačítka vidí jen přihlášený (ideálně Admin, zatím kdokoli přihlášený)
+                            if (isset($_SESSION['user_id'])): 
+                            ?>
+                                <div class="flex gap-4">
+                                    <a href="<?= BASE_URL ?>/index.php?url=exercise/edit/<?= $exercise['id'] ?>" class="text-slate-400 hover:text-slate-800 transition-colors" title="Upravit">✏️</a>
+                                    <a href="<?= BASE_URL ?>/index.php?url=exercise/delete/<?= $exercise['id'] ?>" onclick="return confirm('Opravdu chceš smazat tento cvik?')" class="text-slate-400 hover:text-rose-500 transition-colors" title="Smazat">🗑️</a>
+                                </div>
+                            <?php endif; ?>
+                        </div>
+                    </div>
+                </div>
+            <?php endforeach; ?>
+        </div>
+    <?php endif; ?>
+</main>
+
+<?php require_once '../app/views/layout/footer.php'; ?>
