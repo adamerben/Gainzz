@@ -28,7 +28,7 @@
                             </a>
                         </li>
                         <li class="text-slate-400 text-sm border-l border-slate-700 pl-6 ml-2">
-                            Ahoj, <span class="text-white font-semibold tracking-wide"><?= htmlspecialchars($_SESSION['user_name']) ?></span>
+                            Ahoj, <a href="<?= BASE_URL ?>/index.php?url=user/profile" class="text-white font-semibold tracking-wide hover:text-orange-500 transition-colors underline decoration-orange-500/50 underline-offset-4"><?= htmlspecialchars($_SESSION['user_name']) ?></a>
                         </li>
                         <li>
                             <a href="<?= BASE_URL ?>/index.php?url=auth/logout" class="text-rose-400 hover:text-rose-300 transition-colors text-sm uppercase tracking-wider font-bold">
