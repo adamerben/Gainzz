@@ -8,12 +8,9 @@ class Exercise {
     }
 
     public function getAll() {
-        $sql = "SELECT exercises.*, muscle_groups.name AS muscle_group_name
-"
-             . "FROM exercises
-"
-             . "LEFT JOIN muscle_groups ON exercises.muscle_group_id = muscle_groups.id
-"
+        $sql = "SELECT exercises.*, muscle_groups.name AS muscle_group_name "
+             . "FROM exercises "
+             . "LEFT JOIN muscle_groups ON exercises.muscle_group_id = muscle_groups.id "
              . "ORDER BY exercises.id DESC";
 
         $stmt = $this->db->prepare($sql);
@@ -23,14 +20,10 @@ class Exercise {
     }
 
     public function getById(int $id) {
-        $sql = "SELECT exercises.*, muscle_groups.name AS muscle_group_name
-"
-             . "FROM exercises
-"
-             . "LEFT JOIN muscle_groups ON exercises.muscle_group_id = muscle_groups.id
-"
-             . "WHERE exercises.id = :id
-"
+        $sql = "SELECT exercises.*, muscle_groups.name AS muscle_group_name "
+             . "FROM exercises "
+             . "LEFT JOIN muscle_groups ON exercises.muscle_group_id = muscle_groups.id "
+             . "WHERE exercises.id = :id "
              . "LIMIT 1";
 
         $stmt = $this->db->prepare($sql);
@@ -39,55 +32,55 @@ class Exercise {
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
-    public function create(
-        string $title,
-        int $muscleGroupId,
-        string $equipment,
-        string $difficulty,
-        string $description,
-        ?string $imagePath,
-        ?string $videoLink
-    ): bool {
+    // Opravená metoda create přijímá pole $data
+    public function create(array $data): bool {
         $sql = "INSERT INTO exercises (title, muscle_group_id, equipment, difficulty, description, image_path, video_link)"
              . " VALUES (:title, :muscle_group_id, :equipment, :difficulty, :description, :image_path, :video_link)";
 
         $stmt = $this->db->prepare($sql);
 
         return $stmt->execute([
-            ':title' => $title,
-            ':muscle_group_id' => $muscleGroupId,
-            ':equipment' => $equipment,
-            ':difficulty' => $difficulty,
-            ':description' => $description,
-            ':image_path' => $imagePath,
-            ':video_link' => $videoLink,
+            ':title' => $data['title'],
+            ':muscle_group_id' => $data['muscle_group_id'],
+            ':equipment' => $data['equipment'],
+            ':difficulty' => $data['difficulty'],
+            ':description' => $data['description'],
+            ':image_path' => $data['image_path'] ?? null,
+            ':video_link' => $data['video_link'] ?? null,
         ]);
     }
 
-    public function update(
-        int $id,
-        string $title,
-        int $muscleGroupId,
-        string $equipment,
-        string $difficulty,
-        string $description,
-        ?string $imagePath,
-        ?string $videoLink
-    ): bool {
-        $sql = "UPDATE exercises SET title = :title, muscle_group_id = :muscle_group_id, equipment = :equipment, difficulty = :difficulty, description = :description, image_path = :image_path, video_link = :video_link WHERE id = :id";
+    // Opravená metoda update přijímá pole $data
+    public function update(int $id, array $data): bool {
+        $sql = "UPDATE exercises SET 
+                title = :title, 
+                muscle_group_id = :muscle_group_id, 
+                equipment = :equipment, 
+                difficulty = :difficulty, 
+                description = :description, 
+                video_link = :video_link";
+        
+        $params = [
+            ':id' => $id,
+            ':title' => $data['title'],
+            ':muscle_group_id' => $data['muscle_group_id'],
+            ':equipment' => $data['equipment'],
+            ':difficulty' => $data['difficulty'],
+            ':description' => $data['description'],
+            ':video_link' => $data['video_link'] ?? null,
+        ];
+
+        // Pokud se nahrál nový obrázek, přidáme ho do dotazu
+        if (isset($data['image_path']) && $data['image_path'] !== null) {
+            $sql .= ", image_path = :image_path";
+            $params[':image_path'] = $data['image_path'];
+        }
+
+        $sql .= " WHERE id = :id";
 
         $stmt = $this->db->prepare($sql);
 
-        return $stmt->execute([
-            ':id' => $id,
-            ':title' => $title,
-            ':muscle_group_id' => $muscleGroupId,
-            ':equipment' => $equipment,
-            ':difficulty' => $difficulty,
-            ':description' => $description,
-            ':image_path' => $imagePath,
-            ':video_link' => $videoLink,
-        ]);
+        return $stmt->execute($params);
     }
 
     public function delete(int $id): bool {
