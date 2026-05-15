@@ -1,321 +1,130 @@
 <?php
 
 class ExerciseController {
-    public function index() {
+    private $db;
+    private $exerciseModel;
+    private $muscleGroupModel;
+
+    public function __construct() {
         require_once '../app/models/Database.php';
         require_once '../app/models/Exercise.php';
+        require_once '../app/models/MuscleGroup.php';
 
         $database = new Database();
-        $db = $database->getConnection();
+        $this->db = $database->getConnection();
+        $this->exerciseModel = new Exercise($this->db);
+        $this->muscleGroupModel = new MuscleGroup($this->db);
+    }
 
-        $exerciseModel = new Exercise($db);
-        $exercises = $exerciseModel->getAll();
+    // Pomocná metoda pro kontrolu práv admina
+    private function checkAdmin() {
+        if (!isset($_SESSION['user_id']) || $_SESSION['user_role'] !== 'admin') {
+            $_SESSION['messages']['error'][] = 'K této akci nemáte dostatečná oprávnění.';
+            header('Location: ' . BASE_URL . '/index.php');
+            exit;
+        }
+    }
 
+    public function index() {
+        $exercises = $this->exerciseModel->getAll();
         require_once '../app/views/exercises/exercises_list.php';
     }
 
-    public function show($id = null) {
-        if (!$id) {
-            $this->addErrorMessage('Nebyl zvolen konkrétní cvik.');
-            header('Location: ' . BASE_URL . '/index.php');
-            exit;
-        }
-
-        require_once '../app/models/Database.php';
-        require_once '../app/models/Exercise.php';
-
-        $database = new Database();
-        $db = $database->getConnection();
-
-        $exerciseModel = new Exercise($db);
-        $exercise = $exerciseModel->getById((int)$id);
-
+    public function show($id) {
+        $exercise = $this->exerciseModel->getById($id);
         if (!$exercise) {
-            $this->addErrorMessage('Cvik nebyl nalezen.');
             header('Location: ' . BASE_URL . '/index.php');
             exit;
         }
-
         require_once '../app/views/exercises/exercise_show.php';
     }
 
     public function create() {
-        require_once '../app/models/Database.php';
-        require_once '../app/models/MuscleGroup.php';
-
-        $database = new Database();
-        $db = $database->getConnection();
-
-        $muscleGroupModel = new MuscleGroup($db);
-        $muscleGroups = $muscleGroupModel->getAll();
-
+        $this->checkAdmin(); // Pouze pro adminy
+        $muscleGroups = $this->muscleGroupModel->getAll();
         require_once '../app/views/exercises/exercise_create.php';
     }
 
     public function store() {
-        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-            $this->addNoticeMessage('Formulář nebyl odeslán.');
-            header('Location: ' . BASE_URL . '/index.php');
-            exit;
-        }
+        $this->checkAdmin(); // Pouze pro adminy
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $data = [
+                'title' => trim($_POST['title']),
+                'muscle_group_id' => $_POST['muscle_group_id'],
+                'equipment' => $_POST['equipment'],
+                'difficulty' => $_POST['difficulty'],
+                'description' => trim($_POST['description']),
+                'video_link' => trim($_POST['video_link'] ?? '')
+            ];
 
-        $title = trim(htmlspecialchars($_POST['title'] ?? ''));
-        $muscleGroupId = (int)($_POST['muscle_group_id'] ?? 0);
-        $equipment = trim(htmlspecialchars($_POST['equipment'] ?? ''));
-        $difficulty = trim(htmlspecialchars($_POST['difficulty'] ?? ''));
-        $description = trim(htmlspecialchars($_POST['description'] ?? ''));
-        $videoLink = trim(htmlspecialchars($_POST['video_link'] ?? '')) ?: null;
+            $image_path = $this->handleImageUpload($_FILES['image']);
+            $data['image_path'] = $image_path;
 
-        $errors = [];
-
-        if ($title === '') {
-            $errors[] = 'Název cviku je povinný.';
-        }
-        if ($muscleGroupId <= 0) {
-            $errors[] = 'Musí být vybrána svalová partie.';
-        }
-        if ($equipment === '') {
-            $errors[] = 'Pole vybavení je povinné.';
-        }
-        if ($difficulty === '') {
-            $errors[] = 'Pole obtížnosti je povinné.';
-        }
-        if ($description === '') {
-            $errors[] = 'Popis cviku je povinný.';
-        }
-
-        $imagePath = $this->handleImageUpload($_FILES['image'] ?? null);
-
-        if ($imagePath === false) {
-            $errors[] = 'Nahrání obrázku se nezdařilo. Použijte prosím soubor JPG, PNG nebo GIF.';
-        }
-
-        if (!empty($errors)) {
-            foreach ($errors as $error) {
-                $this->addErrorMessage($error);
+            if ($this->exerciseModel->create($data)) {
+                $_SESSION['messages']['success'][] = 'Cvik byl úspěšně přidán.';
+                header('Location: ' . BASE_URL . '/index.php');
+            } else {
+                $_SESSION['messages']['error'][] = 'Chyba při ukládání cviku.';
+                header('Location: ' . BASE_URL . '/index.php?url=exercise/create');
             }
-            header('Location: ' . BASE_URL . '/index.php?url=exercise/create');
             exit;
         }
-
-        require_once '../app/models/Database.php';
-        require_once '../app/models/Exercise.php';
-
-        $database = new Database();
-        $db = $database->getConnection();
-
-        $exerciseModel = new Exercise($db);
-
-        $isSaved = $exerciseModel->create(
-            $title,
-            $muscleGroupId,
-            $equipment,
-            $difficulty,
-            $description,
-            $imagePath,
-            $videoLink
-        );
-
-        if ($isSaved) {
-            $this->addSuccessMessage('Cvik byl uložen.');
-            header('Location: ' . BASE_URL . '/index.php');
-            exit;
-        }
-
-        $this->addErrorMessage('Nastala chyba při ukládání cviku.');
-        header('Location: ' . BASE_URL . '/index.php?url=exercise/create');
-        exit;
     }
 
-    public function edit($id = null) {
-        if (!$id) {
-            $this->addErrorMessage('Nebyl zvolen cvik k úpravě.');
-            header('Location: ' . BASE_URL . '/index.php');
-            exit;
-        }
-
-        require_once '../app/models/Database.php';
-        require_once '../app/models/Exercise.php';
-        require_once '../app/models/MuscleGroup.php';
-
-        $database = new Database();
-        $db = $database->getConnection();
-
-        $exerciseModel = new Exercise($db);
-        $exercise = $exerciseModel->getById((int)$id);
-
-        if (!$exercise) {
-            $this->addErrorMessage('Cvik se nenašel.');
-            header('Location: ' . BASE_URL . '/index.php');
-            exit;
-        }
-
-        $muscleGroupModel = new MuscleGroup($db);
-        $muscleGroups = $muscleGroupModel->getAll();
-
+    public function edit($id) {
+        $this->checkAdmin(); // Pouze pro adminy
+        $exercise = $this->exerciseModel->getById($id);
+        $muscleGroups = $this->muscleGroupModel->getAll();
         require_once '../app/views/exercises/exercise_edit.php';
     }
 
-    public function update($id = null) {
-        if ($_SERVER['REQUEST_METHOD'] !== 'POST' || !$id) {
-            $this->addNoticeMessage('Formulář nebyl odeslán správně.');
-            header('Location: ' . BASE_URL . '/index.php');
-            exit;
-        }
+    public function update($id) {
+        $this->checkAdmin(); // Pouze pro adminy
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $data = [
+                'title' => trim($_POST['title']),
+                'muscle_group_id' => $_POST['muscle_group_id'],
+                'equipment' => $_POST['equipment'],
+                'difficulty' => $_POST['difficulty'],
+                'description' => trim($_POST['description']),
+                'video_link' => trim($_POST['video_link'] ?? '')
+            ];
 
-        $title = trim(htmlspecialchars($_POST['title'] ?? ''));
-        $muscleGroupId = (int)($_POST['muscle_group_id'] ?? 0);
-        $equipment = trim(htmlspecialchars($_POST['equipment'] ?? ''));
-        $difficulty = trim(htmlspecialchars($_POST['difficulty'] ?? ''));
-        $description = trim(htmlspecialchars($_POST['description'] ?? ''));
-        $videoLink = trim(htmlspecialchars($_POST['video_link'] ?? '')) ?: null;
-
-        $errors = [];
-
-        if ($title === '') {
-            $errors[] = 'Název cviku je povinný.';
-        }
-        if ($muscleGroupId <= 0) {
-            $errors[] = 'Musí být vybrána svalová partie.';
-        }
-        if ($equipment === '') {
-            $errors[] = 'Pole vybavení je povinné.';
-        }
-        if ($difficulty === '') {
-            $errors[] = 'Pole obtížnosti je povinné.';
-        }
-        if ($description === '') {
-            $errors[] = 'Popis cviku je povinný.';
-        }
-
-        require_once '../app/models/Database.php';
-        require_once '../app/models/Exercise.php';
-
-        $database = new Database();
-        $db = $database->getConnection();
-
-        $exerciseModel = new Exercise($db);
-        $exercise = $exerciseModel->getById((int)$id);
-
-        if (!$exercise) {
-            $this->addErrorMessage('Cvik nebyl nalezen.');
-            header('Location: ' . BASE_URL . '/index.php');
-            exit;
-        }
-
-        $imagePath = $exercise['image_path'];
-        $uploadResult = $this->handleImageUpload($_FILES['image'] ?? null);
-        if ($uploadResult === false) {
-            $errors[] = 'Nahrání obrázku se nezdařilo. Použijte prosím soubor JPG, PNG nebo GIF.';
-        } elseif ($uploadResult !== null) {
-            $imagePath = $uploadResult;
-        }
-
-        if (!empty($errors)) {
-            foreach ($errors as $error) {
-                $this->addErrorMessage($error);
+            if (!empty($_FILES['image']['name'])) {
+                $data['image_path'] = $this->handleImageUpload($_FILES['image']);
             }
-            header('Location: ' . BASE_URL . '/index.php?url=exercise/edit/' . (int)$id);
+
+            if ($this->exerciseModel->update($id, $data)) {
+                $_SESSION['messages']['success'][] = 'Cvik byl úspěšně aktualizován.';
+                header('Location: ' . BASE_URL . '/index.php?url=exercise/show/' . $id);
+            } else {
+                $_SESSION['messages']['error'][] = 'Chyba při aktualizaci cviku.';
+                header('Location: ' . BASE_URL . '/index.php?url=exercise/edit/' . $id);
+            }
             exit;
         }
-
-        $isUpdated = $exerciseModel->update(
-            (int)$id,
-            $title,
-            $muscleGroupId,
-            $equipment,
-            $difficulty,
-            $description,
-            $imagePath,
-            $videoLink
-        );
-
-        if ($isUpdated) {
-            $this->addSuccessMessage('Cvik byl aktualizován.');
-            header('Location: ' . BASE_URL . '/index.php?url=exercise/show/' . (int)$id);
-            exit;
-        }
-
-        $this->addErrorMessage('Nastala chyba při aktualizaci cviku.');
-        header('Location: ' . BASE_URL . '/index.php?url=exercise/edit/' . (int)$id);
-        exit;
     }
 
-    public function delete($id = null) {
-        if (!$id) {
-            $this->addErrorMessage('Nebyl zvolen cvik ke smazání.');
-            header('Location: ' . BASE_URL . '/index.php');
-            exit;
-        }
-
-        require_once '../app/models/Database.php';
-        require_once '../app/models/Exercise.php';
-
-        $database = new Database();
-        $db = $database->getConnection();
-
-        $exerciseModel = new Exercise($db);
-        $isDeleted = $exerciseModel->delete((int)$id);
-
-        if ($isDeleted) {
-            $this->addSuccessMessage('Cvik byl smazán.');
+    public function delete($id) {
+        $this->checkAdmin(); // Pouze pro adminy
+        if ($this->exerciseModel->delete($id)) {
+            $_SESSION['messages']['success'][] = 'Cvik byl smazán.';
         } else {
-            $this->addErrorMessage('Nastala chyba při mazání cviku.');
+            $_SESSION['messages']['error'][] = 'Chyba při mazání cviku.';
         }
-
         header('Location: ' . BASE_URL . '/index.php');
         exit;
     }
 
     private function handleImageUpload($file) {
-        if (empty($file) || !isset($file['tmp_name']) || $file['error'] === UPLOAD_ERR_NO_FILE) {
-            return null;
+        if (empty($file['name'])) return null;
+        $targetDir = "../public/uploads/";
+        if (!is_dir($targetDir)) mkdir($targetDir, 0777, true);
+        $fileName = uniqid() . "_" . basename($file["name"]);
+        $targetFile = $targetDir . $fileName;
+        if (move_uploaded_file($file["tmp_name"], $targetFile)) {
+            return "uploads/" . $fileName;
         }
-
-        if ($file['error'] !== UPLOAD_ERR_OK) {
-            return false;
-        }
-
-        $allowedTypes = [
-            'image/jpeg' => 'jpg',
-            'image/jpg' => 'jpg',
-            'image/png' => 'png',
-            'image/gif' => 'gif',
-        ];
-
-        $fileInfo = finfo_open(FILEINFO_MIME_TYPE);
-        $mimeType = finfo_file($fileInfo, $file['tmp_name']);
-        finfo_close($fileInfo);
-
-        if (!array_key_exists($mimeType, $allowedTypes)) {
-            return false;
-        }
-
-        $uploadDir = realpath(__DIR__ . '/../../public/uploads');
-        if ($uploadDir === false) {
-            return false;
-        }
-
-        $extension = $allowedTypes[$mimeType];
-        $newName = 'exercise_' . time() . '_' . bin2hex(random_bytes(5)) . '.' . $extension;
-        $destination = $uploadDir . DIRECTORY_SEPARATOR . $newName;
-
-        if (!move_uploaded_file($file['tmp_name'], $destination)) {
-            return false;
-        }
-
-        return 'uploads/' . $newName;
-    }
-
-    protected function addSuccessMessage($message) {
-        $_SESSION['messages']['success'][] = $message;
-    }
-
-    protected function addNoticeMessage($message) {
-        $_SESSION['messages']['notice'][] = $message;
-    }
-
-    protected function addErrorMessage($message) {
-        $_SESSION['messages']['error'][] = $message;
+        return null;
     }
 }

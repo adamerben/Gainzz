@@ -22,11 +22,13 @@
                     </li>
 
                     <?php if (isset($_SESSION['user_id'])): ?>
-                        <li>
-                            <a href="<?= BASE_URL ?>/index.php?url=exercise/create" class="bg-orange-500 hover:bg-orange-600 text-white font-bold px-5 py-2 rounded-md transition-all shadow-md">
-                                + Přidat cvik
-                            </a>
-                        </li>
+                    <?php if ($_SESSION['user_role'] === 'admin'): ?>
+                            <li>
+                                <a href="<?= BASE_URL ?>/index.php?url=exercise/create" class="bg-orange-500 hover:bg-orange-600 text-white font-bold px-5 py-2 rounded-md transition-all shadow-md">
+                                    + Přidat cvik
+                                </a>
+                            </li>
+                        <?php endif; ?>
                         <li class="text-slate-400 text-sm border-l border-slate-700 pl-6 ml-2">
                             Ahoj, <a href="<?= BASE_URL ?>/index.php?url=user/profile" class="text-white font-semibold tracking-wide hover:text-orange-500 transition-colors underline decoration-orange-500/50 underline-offset-4"><?= htmlspecialchars($_SESSION['user_name']) ?></a>
                         </li>

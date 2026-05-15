@@ -49,10 +49,7 @@
                                 Detail <span class="text-lg">&rarr;</span>
                             </a>
                             
-                            <?php 
-                            // Editační tlačítka vidí jen přihlášený (ideálně Admin, zatím kdokoli přihlášený)
-                            if (isset($_SESSION['user_id'])): 
-                            ?>
+                            <?php if (isset($_SESSION['user_role']) && $_SESSION['user_role'] === 'admin'): ?>
                                 <div class="flex gap-4">
                                     <a href="<?= BASE_URL ?>/index.php?url=exercise/edit/<?= $exercise['id'] ?>" class="text-slate-400 hover:text-slate-800 transition-colors" title="Upravit">✏️</a>
                                     <a href="<?= BASE_URL ?>/index.php?url=exercise/delete/<?= $exercise['id'] ?>" onclick="return confirm('Opravdu chceš smazat tento cvik?')" class="text-slate-400 hover:text-rose-500 transition-colors" title="Smazat">🗑️</a>

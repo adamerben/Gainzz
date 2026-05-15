@@ -51,7 +51,13 @@
                 <label class="block text-xs font-black uppercase tracking-widest text-slate-500 mb-2">Popis techniky</label>
                 <textarea name="description" rows="4" class="w-full bg-slate-50 border-2 border-slate-200 rounded-xl px-4 py-3 focus:border-orange-500 focus:outline-none transition-colors font-bold"><?= htmlspecialchars($exercise['description']) ?></textarea>
             </div>
-
+            <div>
+                <label class="block text-xs font-black uppercase tracking-widest text-slate-500 mb-2">YouTube Video (Odkaz)</label>
+                <input type="url" name="video_link" 
+                    value="<?= isset($exercise['video_link']) ? htmlspecialchars($exercise['video_link']) : '' ?>"
+                    class="w-full bg-slate-50 border-2 border-slate-200 rounded-xl px-4 py-3 focus:border-orange-500 focus:outline-none transition-colors font-bold" 
+                    placeholder="https://www.youtube.com/watch?v=...">
+            </div>
             <div>
                 <label class="block text-xs font-black uppercase tracking-widest text-slate-500 mb-2">
                     Ilustrační obrázek <?= !empty($exercise['image_path']) ? '(Nahráním nového přepíšete původní)' : '' ?>
