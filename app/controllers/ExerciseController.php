@@ -31,13 +31,20 @@ class ExerciseController {
     }
 
     public function show($id) {
-        $exercise = $this->exerciseModel->getById($id);
-        if (!$exercise) {
-            header('Location: ' . BASE_URL . '/index.php');
-            exit;
+            $exercise = $this->exerciseModel->getById($id);
+            if (!$exercise) {
+                header('Location: ' . BASE_URL . '/index.php');
+                exit;
+            }
+
+            // TADY JE TA OPRAVA: Musíme načíst soubor Comment.php, jinak PHP neví, co je class Comment
+            require_once '../app/models/Comment.php'; 
+            
+            $commentModel = new Comment($this->db);
+            $comments = $commentModel->getByExerciseId($id);
+
+            require_once '../app/views/exercises/exercise_show.php';
         }
-        require_once '../app/views/exercises/exercise_show.php';
-    }
 
     public function create() {
         $this->checkAdmin(); // Pouze pro adminy
