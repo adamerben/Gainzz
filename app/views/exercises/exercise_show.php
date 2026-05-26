@@ -98,7 +98,7 @@
                 <form action="<?= BASE_URL ?>/index.php?url=comment/store" method="POST" class="mb-10 bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
                     <input type="hidden" name="exercise_id" value="<?= $exercise['id'] ?>">
                     <label class="block text-xs font-black uppercase tracking-widest text-slate-500 mb-2">Přidat vlastní tip nebo dotaz</label>
-                    <textarea name="content" rows="3" required class="w-full bg-slate-50 border-2 border-slate-200 rounded-xl px-4 py-3 focus:border-orange-500 focus:outline-none transition-colors font-bold" placeholder="Jaké máš s tímto cvikem zkušenosti? Píchnul jsi osobák?"></textarea>
+                    <textarea name="content" rows="3" required class="w-full bg-slate-50 border-2 border-slate-200 rounded-xl px-4 py-3 focus:border-orange-500 focus:outline-none transition-colors font-bold" placeholder="Jaké máš s tímto cvikem zkušenosti?"></textarea>
                     <div class="flex justify-end mt-4">
                         <button type="submit" class="bg-slate-900 hover:bg-orange-500 text-white font-black py-3 px-8 rounded-xl shadow-lg transition-all uppercase tracking-widest hover:-translate-y-1">
                             Odeslat komentář
@@ -114,6 +114,9 @@
             <div class="space-y-6">
                 <?php if (!empty($comments)): ?>
                     <?php foreach ($comments as $comment): ?>
+<div class="space-y-6">
+                <?php if (!empty($comments)): ?>
+                    <?php foreach ($comments as $comment): ?>
                         <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex gap-4">
                             <div class="flex-shrink-0 w-12 h-12 bg-slate-200 text-slate-600 rounded-full flex items-center justify-center font-black text-xl uppercase shadow-inner">
                                 <?= substr(htmlspecialchars($comment['author_name'] ?? '?'), 0, 1) ?>
@@ -121,13 +124,33 @@
                             <div class="flex-grow">
                                 <div class="flex items-baseline justify-between mb-2">
                                     <h4 class="text-slate-900 font-black tracking-wide"><?= htmlspecialchars($comment['author_name'] ?? 'Neznámý') ?></h4>
-                                    <span class="text-xs font-bold text-slate-400"><?= date('d.m.Y H:i', strtotime($comment['created_at'])) ?></span>
+                                    
+                                    <div class="flex items-center gap-4">
+                                        <span class="text-xs font-bold text-slate-400"><?= date('d.m.Y H:i', strtotime($comment['created_at'])) ?></span>
+                                        
+                                        <?php if (isset($_SESSION['user_role']) && $_SESSION['user_role'] === 'admin'): ?>
+                                            <a href="<?= BASE_URL ?>/index.php?url=comment/delete/<?= $comment['id'] ?>" 
+                                               onclick="return confirm('Opravdu chcete smazat tento komentář?')" 
+                                               class="text-xs text-slate-400 hover:text-rose-500 font-bold uppercase tracking-wider transition-colors flex items-center gap-1" 
+                                               title="Smazat komentář">
+                                                🗑️ Smazat
+                                            </a>
+                                        <?php endif; ?>
+                                    </div>
                                 </div>
                                 <p class="text-slate-600 font-medium leading-relaxed text-sm">
                                     <?= nl2br(htmlspecialchars($comment['content'])) ?>
                                 </p>
                             </div>
                         </div>
+                    <?php endforeach; ?>
+                <?php else: ?>
+                    <div class="text-center py-8">
+                        <span class="text-4xl block mb-2">💬</span>
+                        <p class="text-slate-500 font-bold uppercase tracking-widest text-xs">Zatím tu nejsou žádné komentáře. Buď první!</p>
+                    </div>
+                <?php endif; ?>
+            </div>
                     <?php endforeach; ?>
                 <?php else: ?>
                     <div class="text-center py-8">

@@ -33,4 +33,19 @@ class Comment {
             ':created_at' => date('Y-m-d H:i:s'),
         ]);
     }
+
+    // Vyhledání jednoho komentáře podle ID (potřebné pro přesměrování)
+    public function getById(int $id) {
+        $sql = "SELECT * FROM comments WHERE id = :id LIMIT 1";
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute([':id' => $id]);
+        return $stmt->fetch(PDO::FETCH_ASSOC);
+    }
+
+    // Smazání komentáře z databáze
+    public function delete(int $id): bool {
+        $sql = "DELETE FROM comments WHERE id = :id";
+        $stmt = $this->db->prepare($sql);
+        return $stmt->execute([':id' => $id]);
+    }
 }

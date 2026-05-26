@@ -52,24 +52,21 @@
             
             <div>
                 <label class="block text-xs font-black uppercase tracking-widest text-slate-500 mb-2">YouTube Video (Odkaz)</label>
-                <input type="url" name="video_link" 
-                    value="<?= isset($exercise['video_link']) ? htmlspecialchars($exercise['video_link']) : '' ?>"
-                    class="w-full bg-slate-50 border-2 border-slate-200 rounded-xl px-4 py-3 focus:border-orange-500 focus:outline-none transition-colors font-bold" 
-                    placeholder="https://www.youtube.com/watch?v=...">
+                <input type="url" name="video_link" class="w-full bg-slate-50 border-2 border-slate-200 rounded-xl px-4 py-3 focus:border-orange-500 focus:outline-none transition-colors font-bold" placeholder="https://www.youtube.com/watch?v=...">
             </div>
 
             <div>
                 <label class="block text-xs font-black uppercase tracking-widest text-slate-500 mb-2">Ilustrační obrázek</label>
-                <div class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-slate-200 border-dashed rounded-xl bg-slate-50">
-                    <div class="space-y-1 text-center">
+                <div class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-slate-200 border-dashed rounded-xl bg-slate-50 hover:bg-slate-100 transition-colors">
+                    <div class="space-y-1 text-center w-full">
                         <span class="text-3xl block">🖼️</span>
-                        <div class="flex text-sm text-slate-600">
+                        <div class="flex justify-center text-sm text-slate-600">
                             <label for="file-upload" class="relative cursor-pointer font-black text-orange-500 hover:text-orange-600">
-                                <span>Nahrajte soubor</span>
-                                <input id="file-upload" name="image" type="file" class="sr-only">
+                                <span id="file-name-create">Vybrat obrázek z počítače</span>
+                                <input id="file-upload" name="image" type="file" accept="image/*" class="sr-only" onchange="document.getElementById('file-name-create').innerText = this.files[0].name">
                             </label>
                         </div>
-                        <p class="text-xs text-slate-400">PNG, JPG do 2MB</p>
+                        <p class="text-xs text-slate-400">PNG, JPG (Ideálně do 2MB)</p>
                     </div>
                 </div>
             </div>

@@ -62,13 +62,13 @@
                 <label class="block text-xs font-black uppercase tracking-widest text-slate-500 mb-2">
                     Ilustrační obrázek <?= !empty($exercise['image_path']) ? '(Nahráním nového přepíšete původní)' : '' ?>
                 </label>
-                <div class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-slate-200 border-dashed rounded-xl bg-slate-50">
-                    <div class="space-y-1 text-center">
+                <div class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-slate-200 border-dashed rounded-xl bg-slate-50 hover:bg-slate-100 transition-colors">
+                    <div class="space-y-1 text-center w-full">
                         <span class="text-3xl block">🖼️</span>
-                        <div class="flex text-sm text-slate-600">
+                        <div class="flex justify-center text-sm text-slate-600">
                             <label for="file-upload" class="relative cursor-pointer font-black text-orange-500 hover:text-orange-600">
-                                <span>Vybrat nový obrázek</span>
-                                <input id="file-upload" name="image" type="file" class="sr-only">
+                                <span id="file-name-edit">Vybrat nový obrázek</span>
+                                <input id="file-upload" name="image" type="file" accept="image/*" class="sr-only" onchange="document.getElementById('file-name-edit').innerText = this.files[0].name">
                             </label>
                         </div>
                     </div>

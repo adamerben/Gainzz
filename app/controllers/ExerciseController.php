@@ -16,7 +16,6 @@ class ExerciseController {
         $this->muscleGroupModel = new MuscleGroup($this->db);
     }
 
-    // Pomocná metoda pro kontrolu práv admina
     private function checkAdmin() {
         if (!isset($_SESSION['user_id']) || $_SESSION['user_role'] !== 'admin') {
             $_SESSION['messages']['error'][] = 'K této akci nemáte dostatečná oprávnění.';
@@ -31,51 +30,51 @@ class ExerciseController {
     }
 
     public function show($id) {
-            $exercise = $this->exerciseModel->getById($id);
-            if (!$exercise) {
-                header('Location: ' . BASE_URL . '/index.php');
-                exit;
-            }
-
-            // 1. Načtení komentářů z databáze
-            require_once '../app/models/Comment.php'; 
-            $commentModel = new Comment($this->db);
-            $comments = $commentModel->getByExerciseId($id);
-
-            // 2. Zjištění, zda má přihlášený uživatel tento cvik v oblíbených
-            require_once '../app/models/Favorite.php';
-            $favoriteModel = new Favorite($this->db);
-            $isFavorite = false; // Výchozí stav je "nepřidáno"
-            
-            if (isset($_SESSION['user_id'])) {
-                $isFavorite = $favoriteModel->isFavorite($_SESSION['user_id'], $id);
-            }
-
-            // 3. Načtení samotného designu (Toto MUSÍ BÝT VŽDY ÚPLNĚ DOLE, 
-            //    až když máme připravené všechny proměnné jako $exercise, $comments a $isFavorite)
-            require_once '../app/views/exercises/exercise_show.php';
+        $exercise = $this->exerciseModel->getById($id);
+        if (!$exercise) {
+            header('Location: ' . BASE_URL . '/index.php');
+            exit;
         }
 
+        require_once '../app/models/Comment.php'; 
+        $commentModel = new Comment($this->db);
+        $comments = $commentModel->getByExerciseId($id);
+
+        require_once '../app/models/Favorite.php';
+        $favoriteModel = new Favorite($this->db);
+        $isFavorite = false;
+        
+        if (isset($_SESSION['user_id'])) {
+            $isFavorite = $favoriteModel->isFavorite($_SESSION['user_id'], $id);
+        }
+
+        require_once '../app/views/exercises/exercise_show.php';
+    }
+
     public function create() {
-        $this->checkAdmin(); // Pouze pro adminy
+        $this->checkAdmin();
         $muscleGroups = $this->muscleGroupModel->getAll();
         require_once '../app/views/exercises/exercise_create.php';
     }
 
     public function store() {
-        $this->checkAdmin(); // Pouze pro adminy
+        $this->checkAdmin();
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $data = [
-                'title' => trim($_POST['title']),
-                'muscle_group_id' => $_POST['muscle_group_id'],
-                'equipment' => $_POST['equipment'],
-                'difficulty' => $_POST['difficulty'],
-                'description' => trim($_POST['description']),
+                'title' => trim($_POST['title'] ?? ''),
+                'muscle_group_id' => (int)($_POST['muscle_group_id'] ?? 0),
+                'equipment' => trim($_POST['equipment'] ?? ''),
+                'difficulty' => trim($_POST['difficulty'] ?? ''),
+                'description' => trim($_POST['description'] ?? ''),
                 'video_link' => trim($_POST['video_link'] ?? '')
             ];
 
-            $image_path = $this->handleImageUpload($_FILES['image']);
-            $data['image_path'] = $image_path;
+            // Nahrání obrázku - pokud existuje a není prázdný
+            if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
+                $data['image_path'] = $this->handleImageUpload($_FILES['image']);
+            } else {
+                $data['image_path'] = null;
+            }
 
             if ($this->exerciseModel->create($data)) {
                 $_SESSION['messages']['success'][] = 'Cvik byl úspěšně přidán.';
@@ -89,26 +88,30 @@ class ExerciseController {
     }
 
     public function edit($id) {
-        $this->checkAdmin(); // Pouze pro adminy
+        $this->checkAdmin();
         $exercise = $this->exerciseModel->getById($id);
         $muscleGroups = $this->muscleGroupModel->getAll();
         require_once '../app/views/exercises/exercise_edit.php';
     }
 
     public function update($id) {
-        $this->checkAdmin(); // Pouze pro adminy
+        $this->checkAdmin();
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $data = [
-                'title' => trim($_POST['title']),
-                'muscle_group_id' => $_POST['muscle_group_id'],
-                'equipment' => $_POST['equipment'],
-                'difficulty' => $_POST['difficulty'],
-                'description' => trim($_POST['description']),
+                'title' => trim($_POST['title'] ?? ''),
+                'muscle_group_id' => (int)($_POST['muscle_group_id'] ?? 0),
+                'equipment' => trim($_POST['equipment'] ?? ''),
+                'difficulty' => trim($_POST['difficulty'] ?? ''),
+                'description' => trim($_POST['description'] ?? ''),
                 'video_link' => trim($_POST['video_link'] ?? '')
             ];
 
-            if (!empty($_FILES['image']['name'])) {
-                $data['image_path'] = $this->handleImageUpload($_FILES['image']);
+            // Nahrání NOVÉHO obrázku - jen pokud uživatel nějaký vybral
+            if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
+                $uploadedPath = $this->handleImageUpload($_FILES['image']);
+                if ($uploadedPath) {
+                    $data['image_path'] = $uploadedPath;
+                }
             }
 
             if ($this->exerciseModel->update($id, $data)) {
@@ -123,7 +126,7 @@ class ExerciseController {
     }
 
     public function delete($id) {
-        $this->checkAdmin(); // Pouze pro adminy
+        $this->checkAdmin();
         if ($this->exerciseModel->delete($id)) {
             $_SESSION['messages']['success'][] = 'Cvik byl smazán.';
         } else {
@@ -134,14 +137,26 @@ class ExerciseController {
     }
 
     private function handleImageUpload($file) {
-        if (empty($file['name'])) return null;
-        $targetDir = "../public/uploads/";
-        if (!is_dir($targetDir)) mkdir($targetDir, 0777, true);
-        $fileName = uniqid() . "_" . basename($file["name"]);
+        // Kontrola jestli vůbec nějaký soubor reálně dorazil
+        if (!isset($file['name']) || empty($file['name']) || $file['error'] !== UPLOAD_ERR_OK) {
+            return null;
+        }
+
+        // Absolutní cesta k public/uploads (bezpečné odkudkoliv)
+        $targetDir = __DIR__ . '/../../public/uploads/';
+        if (!is_dir($targetDir)) {
+            mkdir($targetDir, 0777, true);
+        }
+
+        // Vyčištění názvu souboru (zbaví se mezer a češtiny, které servery nesnáší)
+        $safeFileName = preg_replace("/[^a-zA-Z0-9.]/", "_", basename($file["name"]));
+        $fileName = uniqid() . "_" . $safeFileName;
         $targetFile = $targetDir . $fileName;
+
         if (move_uploaded_file($file["tmp_name"], $targetFile)) {
             return "uploads/" . $fileName;
         }
+        
         return null;
     }
 }

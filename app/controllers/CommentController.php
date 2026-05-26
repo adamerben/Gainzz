@@ -1,6 +1,16 @@
 <?php
 
 class CommentController {
+    
+    // Pomocná metoda pro kontrolu práv admina
+    private function checkAdmin() {
+        if (!isset($_SESSION['user_id']) || $_SESSION['user_role'] !== 'admin') {
+            $_SESSION['messages']['error'][] = 'K této akci nemáte dostatečná oprávnění.';
+            header('Location: ' . BASE_URL . '/index.php');
+            exit;
+        }
+    }
+
     public function store() {
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
             $exerciseId = (int)($_POST['exercise_id'] ?? 0);
@@ -51,6 +61,38 @@ class CommentController {
         }
 
         header('Location: ' . $redirectUrl);
+        exit;
+    }
+
+    // NOVÁ METODA PRO SMAZÁNÍ KOMENTÁŘE
+    public function delete($id) {
+        $this->checkAdmin(); // Pouze admin smí mazat
+
+        require_once '../app/models/Database.php';
+        require_once '../app/models/Comment.php';
+
+        $database = new Database();
+        $db = $database->getConnection();
+        $commentModel = new Comment($db);
+
+        // Najdeme komentář, abychom věděli, na jaký cvik se po smazání vrátit
+        $comment = $commentModel->getById((int)$id);
+        
+        if (!$comment) {
+            $_SESSION['messages']['error'][] = 'Komentář nebyl nalezen.';
+            header('Location: ' . BASE_URL . '/index.php');
+            exit;
+        }
+
+        $exerciseId = $comment['exercise_id'];
+
+        if ($commentModel->delete((int)$id)) {
+            $_SESSION['messages']['success'][] = 'Komentář byl úspěšně odstraněn.';
+        } else {
+            $_SESSION['messages']['error'][] = 'Chyba při mazání komentáře.';
+        }
+
+        header('Location: ' . BASE_URL . '/index.php?url=exercise/show/' . $exerciseId);
         exit;
     }
 }
