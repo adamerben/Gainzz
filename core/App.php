@@ -1,12 +1,14 @@
 <?php
 
-class App {
+class App
+{
     // Výchozí nastavení, pokud uživatel přijde na hlavní stránku bez parametrů v URL
     protected $controller = 'ExerciseController';
     protected $method = 'index'; // Výchozí metoda typicky zobrazuje seznam (např. seznam knih)
     protected $params = [];
 
-    public function __construct() {
+    public function __construct()
+    {
         // Získání a rozsekání URL adresy na jednotlivá slova
         $url = $this->parseUrl();
 
@@ -38,7 +40,8 @@ class App {
     }
 
     // Pomocná metoda pro bezpečné rozsekání URL adresy
-    public function parseUrl() {
+    public function parseUrl()
+    {
         if (isset($_GET['url'])) {
             // Odstraní lomítko na konci, vyčistí nebezpečné znaky a rozdělí text podle lomítek do pole
             return explode('/', filter_var(rtrim($_GET['url'], '/'), FILTER_SANITIZE_URL));

@@ -1,12 +1,15 @@
 <?php
 
-class AuthController {
-    
-    public function login() {
+class AuthController
+{
+
+    public function login()
+    {
         require_once '../app/views/auth/login.php';
     }
 
-    public function authenticate() {
+    public function authenticate()
+    {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $email = trim($_POST['email'] ?? '');
             $password = $_POST['password'] ?? '';
@@ -25,7 +28,7 @@ class AuthController {
                 $_SESSION['user_id'] = $user['id'];
                 $_SESSION['user_name'] = $user['username'];
                 $_SESSION['user_role'] = $user['role'];
-                
+
                 $_SESSION['messages']['success'][] = 'Úspěšně přihlášen!';
                 header('Location: ' . BASE_URL . '/index.php');
             } else {
@@ -36,11 +39,13 @@ class AuthController {
         }
     }
 
-    public function register() {
+    public function register()
+    {
         require_once '../app/views/auth/register.php';
     }
 
-    public function storeUser() {
+    public function storeUser()
+    {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $username = trim($_POST['username'] ?? '');
             $email = trim($_POST['email'] ?? '');
@@ -97,7 +102,8 @@ class AuthController {
         }
     }
 
-    public function logout() {
+    public function logout()
+    {
         session_destroy();
         session_start();
         $_SESSION['messages']['success'][] = 'Byli jste odhlášeni.';

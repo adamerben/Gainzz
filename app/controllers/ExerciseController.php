@@ -1,11 +1,13 @@
 <?php
 
-class ExerciseController {
+class ExerciseController
+{
     private $db;
     private $exerciseModel;
     private $muscleGroupModel;
 
-    public function __construct() {
+    public function __construct()
+    {
         require_once '../app/models/Database.php';
         require_once '../app/models/Exercise.php';
         require_once '../app/models/MuscleGroup.php';
@@ -16,7 +18,8 @@ class ExerciseController {
         $this->muscleGroupModel = new MuscleGroup($this->db);
     }
 
-    private function checkAdmin() {
+    private function checkAdmin()
+    {
         if (!isset($_SESSION['user_id']) || $_SESSION['user_role'] !== 'admin') {
             $_SESSION['messages']['error'][] = 'K této akci nemáte dostatečná oprávnění.';
             header('Location: ' . BASE_URL . '/index.php');
@@ -24,26 +27,28 @@ class ExerciseController {
         }
     }
 
-    public function index() {
+    public function index()
+    {
         $exercises = $this->exerciseModel->getAll();
         require_once '../app/views/exercises/exercises_list.php';
     }
 
-    public function show($id) {
+    public function show($id)
+    {
         $exercise = $this->exerciseModel->getById($id);
         if (!$exercise) {
             header('Location: ' . BASE_URL . '/index.php');
             exit;
         }
 
-        require_once '../app/models/Comment.php'; 
+        require_once '../app/models/Comment.php';
         $commentModel = new Comment($this->db);
         $comments = $commentModel->getByExerciseId($id);
 
         require_once '../app/models/Favorite.php';
         $favoriteModel = new Favorite($this->db);
         $isFavorite = false;
-        
+
         if (isset($_SESSION['user_id'])) {
             $isFavorite = $favoriteModel->isFavorite($_SESSION['user_id'], $id);
         }
@@ -51,18 +56,20 @@ class ExerciseController {
         require_once '../app/views/exercises/exercise_show.php';
     }
 
-    public function create() {
+    public function create()
+    {
         $this->checkAdmin();
         $muscleGroups = $this->muscleGroupModel->getAll();
         require_once '../app/views/exercises/exercise_create.php';
     }
 
-    public function store() {
+    public function store()
+    {
         $this->checkAdmin();
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $data = [
                 'title' => trim($_POST['title'] ?? ''),
-                'muscle_group_id' => (int)($_POST['muscle_group_id'] ?? 0),
+                'muscle_group_id' => (int) ($_POST['muscle_group_id'] ?? 0),
                 'equipment' => trim($_POST['equipment'] ?? ''),
                 'difficulty' => trim($_POST['difficulty'] ?? ''),
                 'description' => trim($_POST['description'] ?? ''),
@@ -87,19 +94,21 @@ class ExerciseController {
         }
     }
 
-    public function edit($id) {
+    public function edit($id)
+    {
         $this->checkAdmin();
         $exercise = $this->exerciseModel->getById($id);
         $muscleGroups = $this->muscleGroupModel->getAll();
         require_once '../app/views/exercises/exercise_edit.php';
     }
 
-    public function update($id) {
+    public function update($id)
+    {
         $this->checkAdmin();
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $data = [
                 'title' => trim($_POST['title'] ?? ''),
-                'muscle_group_id' => (int)($_POST['muscle_group_id'] ?? 0),
+                'muscle_group_id' => (int) ($_POST['muscle_group_id'] ?? 0),
                 'equipment' => trim($_POST['equipment'] ?? ''),
                 'difficulty' => trim($_POST['difficulty'] ?? ''),
                 'description' => trim($_POST['description'] ?? ''),
@@ -125,7 +134,8 @@ class ExerciseController {
         }
     }
 
-    public function delete($id) {
+    public function delete($id)
+    {
         $this->checkAdmin();
         if ($this->exerciseModel->delete($id)) {
             $_SESSION['messages']['success'][] = 'Cvik byl smazán.';
@@ -136,7 +146,8 @@ class ExerciseController {
         exit;
     }
 
-    private function handleImageUpload($file) {
+    private function handleImageUpload($file)
+    {
         // Kontrola jestli vůbec nějaký soubor reálně dorazil
         if (!isset($file['name']) || empty($file['name']) || $file['error'] !== UPLOAD_ERR_OK) {
             return null;
@@ -156,7 +167,7 @@ class ExerciseController {
         if (move_uploaded_file($file["tmp_name"], $targetFile)) {
             return "uploads/" . $fileName;
         }
-        
+
         return null;
     }
 }

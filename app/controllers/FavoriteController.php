@@ -1,6 +1,8 @@
 <?php
-class FavoriteController {
-    public function toggle($exerciseId) {
+class FavoriteController
+{
+    public function toggle($exerciseId)
+    {
         if (!isset($_SESSION['user_id'])) {
             header('Location: ' . BASE_URL . '/index.php?url=auth/login');
             exit;
@@ -8,7 +10,7 @@ class FavoriteController {
 
         require_once '../app/models/Database.php';
         require_once '../app/models/Favorite.php';
-        
+
         $db = (new Database())->getConnection();
         $favoriteModel = new Favorite($db);
         $userId = $_SESSION['user_id'];

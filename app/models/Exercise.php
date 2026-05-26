@@ -1,17 +1,20 @@
 <?php
 
-class Exercise {
+class Exercise
+{
     private PDO $db;
 
-    public function __construct(PDO $db) {
+    public function __construct(PDO $db)
+    {
         $this->db = $db;
     }
 
-    public function getAll() {
+    public function getAll()
+    {
         $sql = "SELECT exercises.*, muscle_groups.name AS muscle_group_name "
-             . "FROM exercises "
-             . "LEFT JOIN muscle_groups ON exercises.muscle_group_id = muscle_groups.id "
-             . "ORDER BY exercises.id DESC";
+            . "FROM exercises "
+            . "LEFT JOIN muscle_groups ON exercises.muscle_group_id = muscle_groups.id "
+            . "ORDER BY exercises.id DESC";
 
         $stmt = $this->db->prepare($sql);
         $stmt->execute();
@@ -19,12 +22,13 @@ class Exercise {
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    public function getById(int $id) {
+    public function getById(int $id)
+    {
         $sql = "SELECT exercises.*, muscle_groups.name AS muscle_group_name "
-             . "FROM exercises "
-             . "LEFT JOIN muscle_groups ON exercises.muscle_group_id = muscle_groups.id "
-             . "WHERE exercises.id = :id "
-             . "LIMIT 1";
+            . "FROM exercises "
+            . "LEFT JOIN muscle_groups ON exercises.muscle_group_id = muscle_groups.id "
+            . "WHERE exercises.id = :id "
+            . "LIMIT 1";
 
         $stmt = $this->db->prepare($sql);
         $stmt->execute([':id' => $id]);
@@ -33,9 +37,10 @@ class Exercise {
     }
 
     // Opravená metoda create přijímá pole $data
-    public function create(array $data): bool {
+    public function create(array $data): bool
+    {
         $sql = "INSERT INTO exercises (title, muscle_group_id, equipment, difficulty, description, image_path, video_link)"
-             . " VALUES (:title, :muscle_group_id, :equipment, :difficulty, :description, :image_path, :video_link)";
+            . " VALUES (:title, :muscle_group_id, :equipment, :difficulty, :description, :image_path, :video_link)";
 
         $stmt = $this->db->prepare($sql);
 
@@ -51,7 +56,8 @@ class Exercise {
     }
 
     // Opravená metoda update přijímá pole $data
-    public function update(int $id, array $data): bool {
+    public function update(int $id, array $data): bool
+    {
         $sql = "UPDATE exercises SET 
                 title = :title, 
                 muscle_group_id = :muscle_group_id, 
@@ -59,7 +65,7 @@ class Exercise {
                 difficulty = :difficulty, 
                 description = :description, 
                 video_link = :video_link";
-        
+
         $params = [
             ':id' => $id,
             ':title' => $data['title'],
@@ -83,7 +89,8 @@ class Exercise {
         return $stmt->execute($params);
     }
 
-    public function delete(int $id): bool {
+    public function delete(int $id): bool
+    {
         $sql = "DELETE FROM exercises WHERE id = :id";
         $stmt = $this->db->prepare($sql);
 

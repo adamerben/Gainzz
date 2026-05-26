@@ -1,13 +1,16 @@
 <?php
 
-class MuscleGroup {
+class MuscleGroup
+{
     private PDO $db;
 
-    public function __construct(PDO $db) {
+    public function __construct(PDO $db)
+    {
         $this->db = $db;
     }
 
-    public function getAll() {
+    public function getAll()
+    {
         $sql = "SELECT * FROM muscle_groups ORDER BY name ASC";
         $stmt = $this->db->prepare($sql);
         $stmt->execute();
