@@ -57,4 +57,4 @@ Pro spuštění projektu na lokálním prostředí (např. XAMPP) postupujte pod
 
 1. **Naklonování repozitáře** do složky `htdocs`:
    ```bash
-   git clone [https://github.com/adamerben/Gainzz.git](https://github.com/adamerben/Gainzz.git) gainzzz
+   git clone [https://github.com/adamerben/Gainzzz.git](https://github.com/adamerben/Gainzzz.git) gainzzz
