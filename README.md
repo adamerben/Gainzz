@@ -1,14 +1,14 @@
-# 🧡 GAINZZZ - Ultimátní databáze cviků
+# 🧡 GAINZZZ - Databáze cviků
 
 **GAINZZZ** je komplexní webová aplikace pro správu fitness cviků, tvorbu tréninkových plánů a výměnu zkušeností mezi sportovci. 
 
-Tento projekt vznikl jako semestrální práce. Je postaven na **čistém PHP** s využitím vlastnoručně navržené **MVC (Model-View-Controller)** architektury, čímž demonstruje pochopení základních principů softwarového inženýrství bez spoléhání se na hotové backendové frameworky.
+Tento projekt vznikl jako semestrální práce. Je postaven na **čistém PHP** s využitím **MVC (Model-View-Controller)** architektury.
 
 ---
 
 ## 🚀 Klíčové vlastnosti
 
-Aplikace nabízí robustní sadu funkcí rozdělenou podle uživatelských rolí:
+Aplikace nabízí sadu funkcí rozdělenou podle uživatelských rolí:
 
 ### 🔐 Bezpečnost a Autentizace
 - Registrace a přihlašování s validací silných hesel (min. 8 znaků, velká/malá písmena, číslice, speciální znaky).
@@ -19,7 +19,7 @@ Aplikace nabízí robustní sadu funkcí rozdělenou podle uživatelských rolí
 - Administrátorské rozhraní pro přidávání, úpravu a mazání cviků.
 - Kategorizace cviků podle svalových partií a potřebného vybavení.
 - Podpora pro nahrávání ilustračních obrázků (ukládání na server).
-- **Integrace YouTube:** Automatický převod vložených odkazů na vložený (embedded) videopřehrávač přímo v detailu cviku.
+- **Integrace YouTube:** Automatický převod vložených odkazů na vložený videopřehrávač přímo v detailu cviku.
 
 ### 👤 Osobní uživatelský profil
 - Správa osobních údajů (váha, výška, bio).
@@ -34,7 +34,7 @@ Aplikace nabízí robustní sadu funkcí rozdělenou podle uživatelských rolí
 ## 🛠️ Použité technologie
 
 - **Backend:** Čisté PHP 8+ (OOP, MVC architektura)
-- **Databáze:** MySQL / MariaDB (komunikace přes PDO s ochranou proti SQL Injection)
+- **Databáze:** MySQL
 - **Frontend:** HTML5, moderní responzivní design pomocí [Tailwind CSS](https://tailwindcss.com/)
 - **Server:** Apache (lokální vývoj přes XAMPP)
 
